@@ -1,0 +1,259 @@
+<div class="portafolio-container" [class]="clasesTema()">
+  
+  <header class="header">
+    <div class="header-content">
+      <h1 class="logo">{{ nombreCompleto() }}</h1>
+      
+      <nav class="navegacion">
+        <button 
+          [class.activo]="seccionActiva() === 'inicio'"
+          (click)="cambiarSeccion('inicio')">
+          🏠 Inicio
+        </button>
+        <button 
+          [class.activo]="seccionActiva() === 'educacion'"
+          (click)="cambiarSeccion('educacion')">
+          🎓 Educacion
+        </button>
+        <button 
+          [class.activo]="seccionActiva() === 'habilidades'"
+          (click)="cambiarSeccion('habilidades')">
+          💡 Habilidades
+        </button>
+        <button 
+          [class.activo]="seccionActiva() === 'proyectos'"
+          (click)="cambiarSeccion('proyectos')">
+          🚀 Proyectos
+        </button>
+        <button 
+          [class.activo]="seccionActiva() === 'contacto'"
+          (click)="cambiarSeccion('contacto')">
+          📧 Contacto
+        </button>
+      </nav>
+
+      <button class="btn-tema" (click)="toggleTema()">
+        {{ temaOscuro() ? '☀️ Claro' : '🌙 Oscuro' }}
+      </button>
+    </div>
+  </header>
+
+  <main class="contenido-principal">
+
+    @if (seccionActiva() === 'inicio') {
+      <section class="seccion seccion-inicio">
+        <div class="perfil-card">
+          <img [src]="datosPersonales.foto" alt="Foto de perfil" class="foto-perfil">
+          
+          <h2>{{ nombreCompleto() }}</h2>
+          <p class="subtitulo">Tecnologo en Sistemas | Desarrollador Web</p>
+          
+          <p class="descripcion">{{ datosPersonales.descripcion }}</p>
+
+          <button class="btn-detalles" (click)="toggleDetalles()">
+            {{ mostrarDetalles() ? '🔼 Ocultar Detalles' : '🔽 Ver Detalles' }}
+          </button>
+
+          @if (mostrarDetalles()) {
+            <div class="detalles-contacto">
+              <p>📧 {{ datosPersonales.email }}</p>
+              <p>📱 {{ datosPersonales.telefono }}</p>
+              <p>📍 {{ datosPersonales.ubicacion }}</p>
+              <p>💼 {{ datosPersonales.linkedin }}</p>
+              <p>🐙 {{ datosPersonales.github }}</p>
+            </div>
+          }
+
+          <div class="contador-visitas">
+            <span>👁️ Visitas: {{ contadorVisitas() }}</span>
+            <button (click)="incrementarVisitas()" class="btn-mini">+1</button>
+          </div>
+        </div>
+      </section>
+    }
+
+    @if (seccionActiva() === 'educacion') {
+      <section class="seccion seccion-educacion">
+        <h2>🎓 Formacion Academica</h2>
+        
+        <div class="timeline">
+          @for (edu of educacion; track edu.titulo) {
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <h3>{{ edu.titulo }}</h3>
+                <p class="institucion">{{ edu.institucion }}</p>
+                <span class="anio">{{ edu.anio }}</span>
+                <p class="descripcion-edu">{{ edu.descripcion }}</p>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (seccionActiva() === 'habilidades') {
+      <section class="seccion seccion-habilidades">
+        <h2>💡 Mis Habilidades</h2>
+
+        <div class="filtros">
+          <button 
+            [class.filtro-activo]="filtroHabilidad() === 'todas'"
+            (click)="cambiarFiltro('todas')">
+            📚 Todas
+          </button>
+          <button 
+            [class.filtro-activo]="filtroHabilidad() === 'frontend'"
+            (click)="cambiarFiltro('frontend')">
+            🎨 Frontend
+          </button>
+          <button 
+            [class.filtro-activo]="filtroHabilidad() === 'backend'"
+            (click)="cambiarFiltro('backend')">
+            ⚙️ Backend
+          </button>
+          <button 
+            [class.filtro-activo]="filtroHabilidad() === 'herramientas'"
+            (click)="cambiarFiltro('herramientas')">
+            🔧 Herramientas
+          </button>
+        </div>
+
+        <div class="estadisticas">
+          <span>📊 Mostrando: {{ totalHabilidadesMostradas() }} habilidades</span>
+          <span>📈 Promedio: {{ promedioHabilidades() }}%</span>
+        </div>
+
+        <div class="habilidades-grid">
+          @for (hab of habilidadesFiltradas(); track hab.nombre) {
+            <div class="habilidad-card">
+              <div class="habilidad-header">
+                <span class="icono">{{ getIconoCategoria(hab.categoria) }}</span>
+                <h4>{{ hab.nombre }}</h4>
+              </div>
+              <div class="barra-progreso">
+                <div 
+                  class="progreso" 
+                  [style.width.%]="hab.nivel"
+                  [style.backgroundColor]="getColorNivel(hab.nivel)">
+                </div>
+              </div>
+              <span class="nivel">{{ hab.nivel }}%</span>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (seccionActiva() === 'proyectos') {
+      <section class="seccion seccion-proyectos">
+        <h2>🚀 Mis Proyectos</h2>
+
+        <div class="proyectos-grid">
+          @for (proyecto of proyectos; track proyecto.nombre; let i = $index) {
+            <div 
+              class="proyecto-card"
+              [class.proyecto-expandido]="proyectoSeleccionado() === i"
+              (click)="seleccionarProyecto(i)">
+              
+              <div class="proyecto-imagen">
+                <img [src]="proyecto.imagen" [alt]="proyecto.nombre">
+                <span class="proyecto-estado">{{ proyecto.estado }}</span>
+              </div>
+
+              <div class="proyecto-contenido">
+                <h3>{{ proyecto.nombre }}</h3>
+                <p class="proyecto-fecha">📅 {{ proyecto.fecha }}</p>
+                <p>{{ proyecto.descripcion }}</p>
+
+                @if (proyectoSeleccionado() === i) {
+                  <div class="proyecto-detalles">
+                    
+                    <div class="caracteristicas-seccion">
+                      <h4>✨ Características principales:</h4>
+                      <ul class="caracteristicas-lista">
+                        @for (caracteristica of proyecto.caracteristicas; track caracteristica) {
+                          <li>{{ caracteristica }}</li>
+                        }
+                      </ul>
+                    </div>
+
+                    <div class="tecnologias-seccion">
+                      <h4>🛠️ Tecnologías utilizadas:</h4>
+                      <div class="tecnologias">
+                        @for (tech of proyecto.tecnologias; track tech) {
+                          <span class="tech-tag">{{ tech }}</span>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="proyecto-enlaces">
+                      <a [href]="proyecto.repositorio" target="_blank" class="btn-proyecto btn-repositorio">
+                        🐙 Repositorio
+                      </a>
+                      @if (proyecto.demo) {
+                        <a [href]="proyecto.demo" target="_blank" class="btn-proyecto btn-demo">
+                          🌐 Ver Demo
+                        </a>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <p class="click-expandir">
+                  {{ proyectoSeleccionado() === i ? '▲ Click para contraer' : '▼ Click para ver más detalles' }}
+                </p>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    @if (seccionActiva() === 'contacto') {
+      <section class="seccion seccion-contacto">
+        <h2>📧 Contactame</h2>
+
+        <div class="contacto-card">
+          <div class="info-contacto">
+            <p>📧 {{ datosPersonales.email }}</p>
+            <p>📱 {{ datosPersonales.telefono }}</p>
+            <p>📍 {{ datosPersonales.ubicacion }}</p>
+          </div>
+
+          <div class="formulario-contacto">
+            <h3>Enviame un mensaje</h3>
+            <textarea 
+              [ngModel]="mensajeContacto()"
+              (ngModelChange)="mensajeContacto.set($event)"
+              placeholder="Escribe tu mensaje aqui..."
+              rows="4">
+            </textarea>
+            
+            <p class="contador-caracteres">
+              Caracteres: {{ mensajeContacto().length }}
+            </p>
+
+            <button 
+              class="btn-enviar" 
+              (click)="enviarMensaje()"
+              [disabled]="!mensajeContacto().trim()">
+              📤 Enviar Mensaje
+            </button>
+          </div>
+        </div>
+      </section>
+    }
+  </main>
+
+  <footer class="footer">
+    <p>© 2024 {{ nombreCompleto() }} - Todos los derechos reservados</p>
+    <p>
+      <small>
+        🎨 Tema: {{ temaOscuro() ? 'Oscuro' : 'Claro' }} | 
+        📍 Seccion: {{ seccionActiva() }} |
+        👁️ Visitas: {{ contadorVisitas() }}
+      </small>
+    </p>
+  </footer>
+</div>
